@@ -1,0 +1,44 @@
+#property_me_externsion_popup_button{
+    border: none;
+    border-top-left-radius: 15px;
+    border-bottom-left-radius: 15px;
+    position: fixed;
+    box-shadow: -5px 0px 15px rgb(0 0 0);
+    z-index: 99999999;
+    right: 0px;
+    top: 100px;
+    background-color: #252C39;
+    padding: 10px
+}
+
+#property_me_extension_header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: none;
+    padding-bottom: 0px;
+    margin-bottom: 0px;
+}
+
+#property_me_extension_header img{
+    width: 60px;
+}
+
+#property_me_externsion_avatar{
+    padding: 10px;
+    border: 2px solid green;
+    border-radius: 50%;
+    color: green;
+    font-weight: bold;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    font-size: 18px;
+    justify-content: center;
+    align-items: center;
+}
+
+#property_me_extension_content iframe{
+    border: none;
+    outline: none;
+}
