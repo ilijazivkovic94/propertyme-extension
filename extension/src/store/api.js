@@ -8,5 +8,10 @@ const instance = axios.create({
 
  */
 const loginInstance = axios.create({
-  baseURL: `https://app.propertyme.com/api/openapi`,
+  baseURL: `https://login.propertyme.com/connect/token`,
 });
+
+export default {
+    instance,
+    loginInstance,
+}
