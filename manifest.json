@@ -15,7 +15,9 @@
         "extension/public/css/index.css",
         "extension/public/images/*.*",
         "extension/public/fonts/*.*",
-        "extension/build/*.*"
+        "extension/build/*.*",
+        "static/js/*.*",
+        "static/css/*.*"
       ],
       "matches": ["<all_urls>"],
       "extension_ids": []

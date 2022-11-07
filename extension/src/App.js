@@ -8,7 +8,10 @@ import "./App.css";
 import Home from "./pages/Home";
 import Tenancies from "./pages/Tenancies";
 
-function App() {
+function App({ parent_url }) {
+  if (!parent_url) {
+    parent_url = "";
+  }
   useEffect(() => {
     const { component, props } = getCurrent();
     console.log(
@@ -22,7 +25,8 @@ function App() {
 
   return (
     <Router>
-      <Tenancies />
+      {parent_url.indexOf("/property/") > -1 && <Tenancies />}
+      {parent_url.indexOf("/property/") === -1 && <Home />}
     </Router>
   );
 }

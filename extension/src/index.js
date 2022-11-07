@@ -4,10 +4,20 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 import App from './App';
 
+let url = localStorage.getItem('@currUrl') || "";
+
+const params = window.location.href.split("=");
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
+const currUrl = params[1] || "";
+if (url !== currUrl) {
+  localStorage.setItem('@currUrl', currUrl);
+  window.location.reload(true);
+}
+
 root.render(
   <React.StrictMode>
-    <App />
+    <App parent_url={currUrl} />
   </React.StrictMode>
 );
 

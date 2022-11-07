@@ -17,17 +17,19 @@ chrome.runtime.onMessage.addListener((request) => {
 insertButton();
 
 function insertButton() {
-    const url = window.location.href;
+  const url = encodeURI(window.location.href);
 
-    const page_url = chrome.runtime.getURL("/extension/build/index.html");
-    const logo = chrome.runtime.getURL("/extension/public/images/logo.png");
+  const page_url = chrome.runtime.getURL(
+    "/extension/build/index.html?url=" + url
+  );
+  const logo = chrome.runtime.getURL("/extension/public/images/logo.png");
 
-    const mask = document.createElement("div");
-    mask.setAttribute("id", "property_me_externsion_container");
-    const modal = document.createElement("div");
-    modal.setAttribute("id", "property_me_externsion_popup_button");
+  const mask = document.createElement("div");
+  mask.setAttribute("id", "property_me_externsion_container");
+  const modal = document.createElement("div");
+  modal.setAttribute("id", "property_me_externsion_popup_button");
 
-    modal.innerHTML = `
+  modal.innerHTML = `
         <div id="property_me_extension_header">
             <img src="${logo}" id="property_me_extension_header_toggle" />
             <div id="property_me_externsion_avatar" style="display: none;">
@@ -39,29 +41,51 @@ function insertButton() {
         </div>
     `;
 
-    mask.innerHTML = modal.outerHTML;
-    document.body.appendChild(mask);
+  mask.innerHTML = modal.outerHTML;
+  document.body.appendChild(mask);
 
-    var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
-    var eventer = window[eventMethod];
-    var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
+  var eventMethod = window.addEventListener
+    ? "addEventListener"
+    : "attachEvent";
+  var eventer = window[eventMethod];
+  var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
 
-    // Listen to message from child window
-    eventer(messageEvent,function(e) {
-      console.log('parent received message!:  ',e.data);
-      document.getElementById('property_me_extension_content_iframe').height = e.data + 'px';
-    },false);
+  // Listen to message from child window
+  eventer(
+    messageEvent,
+    function (e) {
+      console.log("parent received message!:  ", e.data);
+      document.getElementById("property_me_extension_content_iframe").height =
+        e.data + "px";
+    },
+    false
+  );
 
-    document
-      .querySelector("#property_me_extension_header_toggle")
-      .addEventListener("click", () => {
-        const avatar = document.querySelector('#property_me_externsion_avatar');
-        avatar.style.display = avatar.style.display === 'none' ? "flex" : 'none';
+  document
+    .querySelector("#property_me_extension_header_toggle")
+    .addEventListener("click", () => {
+      const avatar = document.querySelector("#property_me_externsion_avatar");
+      avatar.style.display = avatar.style.display === "none" ? "flex" : "none";
 
-        document.querySelector('#property_me_extension_header').style.borderBottom = avatar.style.display === 'none' ? "none" : '1px solid green';
-        document.querySelector('#property_me_extension_header').style.paddingBottom = avatar.style.display === 'none' ? "0px" : '5px';
-        document.querySelector('#property_me_extension_header').style.marginBottom = avatar.style.display === 'none' ? "0px" : '5px';
-        const content = document.querySelector('#property_me_extension_content');
-        content.style.display = content.style.display === 'none' ? "block" : 'none';
-      })
+      document.querySelector(
+        "#property_me_extension_header"
+      ).style.borderBottom =
+        avatar.style.display === "none" ? "none" : "1px solid green";
+      document.querySelector(
+        "#property_me_extension_header"
+      ).style.paddingBottom = avatar.style.display === "none" ? "0px" : "5px";
+      document.querySelector(
+        "#property_me_extension_header"
+      ).style.marginBottom = avatar.style.display === "none" ? "0px" : "5px";
+      const content = document.querySelector("#property_me_extension_content");
+      content.style.display =
+        content.style.display === "none" ? "block" : "none";
+      const iframe_url = chrome.runtime.getURL(
+        "/extension/build/index.html?url=" + encodeURI(window.location.href)
+      );
+      document.querySelector("#property_me_extension_content_iframe").src = iframe_url;
+    });
+  window.addEventListener("popstate", function () {
+    window.location.reload();
+  });
 }
