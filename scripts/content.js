@@ -81,11 +81,14 @@ function insertButton() {
       content.style.display =
         content.style.display === "none" ? "block" : "none";
       const iframe_url = chrome.runtime.getURL(
-        "/extension/build/index.html?url=" + encodeURI(window.location.href)
+        "/extension/build/index.html?updated=" + (new Date().getTime()) + "&url=" + encodeURI(window.location.href)
       );
       document.querySelector("#property_me_extension_content_iframe").src = iframe_url;
     });
   window.addEventListener("popstate", function () {
-    window.location.reload();
+    const iframe_url = chrome.runtime.getURL(
+      "/extension/build/index.html?updated=" + (new Date().getTime()) + "&url=" + encodeURI(window.location.href)
+    );
+    document.querySelector("#property_me_extension_content_iframe").src = iframe_url;
   });
 }

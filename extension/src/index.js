@@ -9,7 +9,7 @@ let url = localStorage.getItem('@currUrl') || "";
 const params = window.location.href.split("=");
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-const currUrl = params[1] || "";
+const currUrl = params[2] || "";
 if (url !== currUrl) {
   localStorage.setItem('@currUrl', currUrl);
   window.location.reload(true);

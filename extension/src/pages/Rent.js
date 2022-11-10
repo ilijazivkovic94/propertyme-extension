@@ -2,18 +2,28 @@ import Tasks from '../pages/Tasks';
 import ListItem from '../components/ListItem';
 
 const RENT = () => {
+  const [rentList, setRentList] = useState([]);
+
+  const getRentals = () => {
+    instance.get("/lots/rentals?Offset=0&Limit=100").then((res) => {
+      setRentList(res);
+    });
+  };
+
+  useEffect(() => {
+    getRentals();
+  }, []);
+
   return (
     <div className="App">
-      <ListItem
-        linkText={"Rent"}
-        link={Tasks}
-        subText={"PAID TO - MON 14-11"}
-      />
-      <ListItem
-        linkText={"Rent"}
-        link={Tasks}
-        subText={"$206 IN ARREARS - 5 DAYS"}
-      />
+      {rentList.map(item => (
+        <ListItem
+          linkText={"Rent"}
+          link={Tasks}
+          subText={`PAID TO - ${item.EffectivePaidTo}`}
+        />
+      ))}
+      {rentList.length === 0 && <div style={{textAlign: 'center', color: 'grey', width: '100%' }}>No Rents</div>}
     </div>
   );
 };
