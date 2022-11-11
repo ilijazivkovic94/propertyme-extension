@@ -8,7 +8,7 @@ import "./App.css";
 import Home from "./pages/Home";
 import Tenancies from "./pages/Tenancies";
 
-function App({ parent_url }) {
+function App({ parent_url, property_url, unread }) {
   if (!parent_url) {
     parent_url = "";
   }
@@ -25,8 +25,8 @@ function App({ parent_url }) {
 
   return (
     <Router>
-      {parent_url.indexOf("/property/") > -1 && <Tenancies />}
-      {parent_url.indexOf("/property/") === -1 && <Home />}
+      {(parent_url.indexOf("%2Fproperty%2F") > -1 || property_url) && <Tenancies />}
+      {(parent_url.indexOf("%2Fproperty%2F") === -1 && !property_url) && <Home unread={unread} />}
     </Router>
   );
 }

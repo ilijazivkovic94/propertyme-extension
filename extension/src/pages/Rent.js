@@ -1,31 +1,42 @@
 import Tasks from '../pages/Tasks';
 import ListItem from '../components/ListItem';
+import { useEffect, useState } from 'react';
+import { instance } from '../store/api';
+import BackButton from '../components/BackButton';
 
-const RENT = () => {
-  const [rentList, setRentList] = useState([]);
+const Rent = ({ id }) => {
+  const [detailInfo, setDetailInfo] = useState(null);
 
-  const getRentals = () => {
-    instance.get("/lots/rentals?Offset=0&Limit=100").then((res) => {
-      setRentList(res);
+  const getDetails = () => {
+    instance.get("/lots/" + id + "/detail").then((res) => {
+      setDetailInfo(res);
     });
   };
 
   useEffect(() => {
-    getRentals();
+    getDetails();
   }, []);
 
   return (
     <div className="App">
-      {rentList.map(item => (
+      {(detailInfo && detailInfo.Tenancy && detailInfo.Tenancy.PaidTo) && (
         <ListItem
           linkText={"Rent"}
-          link={Tasks}
-          subText={`PAID TO - ${item.EffectivePaidTo}`}
+          subText={`PAID TO - ${detailInfo?.Tenancy?.PaidTo}`}
+          textLink={"https://app.propertyme.com/#/property/card/" + id}
         />
-      ))}
-      {rentList.length === 0 && <div style={{textAlign: 'center', color: 'grey', width: '100%' }}>No Rents</div>}
+      )}
+      {(detailInfo && detailInfo.Tenancy && detailInfo.Tenancy.RentArrears) && (
+        <ListItem
+          linkText={"Rent"}
+          subText={`$${detailInfo?.Tenancy?.RentArrears} IN ARREARS - ${detailInfo?.Tenancy?.RentArrearsByPeriod} DAYS`}
+          textLink={"https://app.propertyme.com/#/property/card/" + id}
+        />
+      )}
+      {!detailInfo && <div style={{textAlign: 'center', color: 'grey', width: '100%' }}>No Rents</div>}
+      <BackButton />
     </div>
   );
 };
 
-export default RENT;
+export default Rent;

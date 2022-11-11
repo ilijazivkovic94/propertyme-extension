@@ -3,11 +3,15 @@ import Tenancy from "../components/Tenancy";
 import { instance } from "../store/api";
 
 const Tenancies = () => {
+  const [isLoading, setLoading] = useState(false);
   const [tenancyList, setTenancyList] = useState([]);
 
   const getTenancies = () => {
+    setLoading(true);
     instance.get("/lots?Timestamp=" + new Date().getTime()).then((res) => {
       setTenancyList(res);
+      setLoading(false);
+      window.parent.postMessage(document.querySelector('#tenancy_list').scrollHeight);
     });
   };
 
@@ -15,7 +19,10 @@ const Tenancies = () => {
     getTenancies();
   }, []);
   return (
-    <div>
+    <div id="tenancy_list">
+      {isLoading && !tenancyList.length && (
+        <div style={{ display: 'flex', flex: 1, textAlign: 'center', width: '100%', color: 'white', justifyContent: 'center', alignItems: 'center' }}>Loading...</div>
+      )}
       {tenancyList.map((item) => (
         <Tenancy
           name={item.Reference}
@@ -23,29 +30,10 @@ const Tenancies = () => {
           rent={`PAID TO - ${item.EffectivePaidTo}`}
           bond={"PAID UP TO DATE"}
           invoice={"NO PENDING INVOICES"}
+          link={'https://app.propertyme.com/#/property/card/' + item.Id}
+          id={item.Id}
         />
       ))}
-      <Tenancy
-        name={"14 St Quentin Avenue, Marooc..."}
-        subtitle={"Tenant First Names displayed..."}
-        rent={"PAID TO - MON 14/11/22"}
-        bond={"PAID UP TO DATE"}
-        invoice={"NO PENDING INVOICES"}
-      />
-      <Tenancy
-        name={"14 St Quentin Avenue, Marooc..."}
-        subtitle={"Tenant First Names displayed..."}
-        rent={"PAID TO - MON 14/11/22"}
-        bond={"PAID UP TO DATE"}
-        invoice={"NO PENDING INVOICES"}
-      />
-      <Tenancy
-        name={"14 St Quentin Avenue, Marooc..."}
-        subtitle={"Tenant First Names displayed..."}
-        rent={"PAID TO - MON 14/11/22"}
-        bond={"PAID UP TO DATE"}
-        invoice={"NO PENDING INVOICES"}
-      />
     </div>
   );
 };

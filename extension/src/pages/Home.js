@@ -5,7 +5,7 @@ import Tasks from './Tasks';
 import ListItem from '../components/ListItem';
 import { useEffect, useState } from 'react';
 
-const Home = () => {
+const Home = ({ unread }) => {
   const [outboxCount, setOutboxCount] = useState(-1);
   const [billsCount, setBillsCount] = useState(-1);
   const [jobsCount, setJobsCount] = useState(-1);
@@ -25,7 +25,7 @@ const Home = () => {
 
   const geJobsCounts = () => {
     instance.get('/dashboards/activities/Jobs').then(res => {
-      setJobsCount(res.ValueWidgets[0].Quantity);
+      setJobsCount(res.DetailWidgets[0].Values[1].Quantity);
     });
   }
 
@@ -47,45 +47,53 @@ const Home = () => {
       <ListItem
         linkText={"Tasks"}
         link={Tasks}
-        subText={`${tasksCount} OVERDUE`}
+        subText={`${tasksCount < 0 ? 0 : tasksCount} OVERDUE`}
+        textLink={"https://app.propertyme.com/#/task/list"}
       />
       <ListItem
         linkText={"Inbox"}
         link={Tasks}
-        subText={"9 UNREAD, 2 OPENED"}
+        subText={(unread ? unread : 0) + " UNREAD"}
+        textLink={"https://app.propertyme.com/#/message/inbox"}
       />
       <ListItem
         linkText={"Outbox"}
         link={Tasks}
-        subText={`${outboxCount} READY TO SEND`}
+        subText={`${outboxCount < 0 ? 0 : outboxCount} READY TO SEND`}
+        textLink={"https://app.propertyme.com/#/message/list"}
       />
       <ListItem
         linkText={"Bills"}
         link={Tasks}
-        subText={`${billsCount} WAITING APPROVAL`}
+        subText={`${billsCount < 0 ? 0 : billsCount} WAITING APPROVAL`}
+        textLink={"https://app.propertyme.com/#/bill/list"}
       />
       <ListItem
         linkText={"Jobs"}
         link={Tasks}
-        subText={`${jobsCount} Active Jobs`}
+        subText={`${jobsCount < 0 ? 0 : jobsCount} Active Jobs`}
+        textLink={"https://app.propertyme.com/#/jobtask/list"}
       />
       <ListItem
         linkText={"Leases Renewals"}
         link={Tasks}
         subText={"CLICK HERE"}
-        subLink={Applications}
+        subLink={"https://app.propertyme.com/#/property/list"}
+        textLink={"https://app.propertyme.com/#/property/list"}
       />
       <ListItem
         linkText={"My Applications"}
         link={Applications}
         subText={"CLICK HERE"}
-        subLink={Applications}
+        subLink={"https://app.propertyme.com/#/property/list"}
+        textLink={"https://app.propertyme.com/#/property/list"}
       />
       <ListItem
         linkText={"Aura Rentals"}
         link={Rentals}
         subText={"CLICK HERE"}
-        subLink={Rentals}
+        subLink={"https://app.propertyme.com/#/property/list"}
+        textLink={"https://app.propertyme.com/#/property/list"}
       />
     </div>
   );

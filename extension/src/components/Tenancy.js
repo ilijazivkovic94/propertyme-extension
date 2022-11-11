@@ -1,6 +1,9 @@
 import { Link } from "react-chrome-extension-router";
+import Rent from "../pages/Rent";
+import Bond from "../pages/Bond";
+import Invoice from "../pages/Invoice";
 
-const Tenancy = ({ name, subtitle, rent, bond, invoice }) => {
+const Tenancy = ({ name, subtitle, rent, link, id }) => {
   return (
     <div
       style={{
@@ -12,7 +15,7 @@ const Tenancy = ({ name, subtitle, rent, bond, invoice }) => {
         borderBottom: "1px solid #88CBB7",
       }}
     >
-      <Link style={{ color: "#88CBB7", fontWeight: "bold", textOverflow: "elipsis", fontSize: 16, }}>{name}</Link>
+      <Link style={{ color: "#88CBB7", fontWeight: "bold", textOverflow: "elipsis", fontSize: 16, }} onClick={() => { window.parent.location.href = link }}>{name}</Link>
       <p style={{ fontSize: 16, color: 'white' }}>{subtitle}</p>
       <div
         style={{
@@ -33,6 +36,8 @@ const Tenancy = ({ name, subtitle, rent, bond, invoice }) => {
         >
           <Link
             style={{ color: "#88CBB7", fontWeight: "bold" }}
+            component={Rent}
+            props={{ id }}
           >
             Rent
           </Link>
@@ -67,6 +72,8 @@ const Tenancy = ({ name, subtitle, rent, bond, invoice }) => {
         >
           <Link
             style={{ color: "#88CBB7", fontWeight: "bold" }}
+            component={Bond}
+            props={{ id }}
           >
             Bond
           </Link>
@@ -79,7 +86,7 @@ const Tenancy = ({ name, subtitle, rent, bond, invoice }) => {
             color: "white",
           }}
         >
-          {bond}
+          Click Here
         </div>
       </div>
       <div
@@ -101,6 +108,8 @@ const Tenancy = ({ name, subtitle, rent, bond, invoice }) => {
         >
           <Link
             style={{ color: "#88CBB7", fontWeight: "bold" }}
+            component={Invoice}
+            props={{ id }}
           >
             Invoice
           </Link>
@@ -113,7 +122,7 @@ const Tenancy = ({ name, subtitle, rent, bond, invoice }) => {
             color: "white",
           }}
         >
-          {invoice}
+          Click Here
         </div>
       </div>
     </div>

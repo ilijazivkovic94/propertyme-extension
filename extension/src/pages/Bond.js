@@ -1,19 +1,38 @@
-import Tasks from './Tasks';
-import ListItem from '../components/ListItem';
+import ListItem from "../components/ListItem";
+import { useEffect, useState } from "react";
+import { instance } from "../store/api";
+import BackButton from "../components/BackButton";
 
-const Bond = () => {
+const Bond = ({ id }) => {
+  const [detailInfo, setDetailInfo] = useState(null);
+
+  const getDetail = () => {
+    instance.get("/lots/" + id + "/detail").then((res) => {
+      setDetailInfo(res);
+    });
+  };
+
+  useEffect(() => {
+    getDetail();
+  }, []);
   return (
     <div className="App">
-      <ListItem
-        linkText={"Bond"}
-        link={Tasks}
-        subText={"PAID UP TO DATE"}
-      />
-      <ListItem
-        linkText={"Bond"}
-        link={Tasks}
-        subText={"IN ARREARS - $160 OWING"}
-      />
+      
+      {!detailInfo && (
+        <ListItem
+          linkText={"Bond"}
+          subText={"PAID UP TO DATE"}
+          textLink={"https://app.propertyme.com/#/property/card/" + id}
+        />
+      )}
+      {detailInfo && detailInfo.Tenancy && detailInfo.Tenancy.RentArrears && (
+        <ListItem
+          linkText={"Bond"}
+          subText={`IN ARREARS - $${detailInfo?.Tenancy?.BondAmount - detailInfo?.Tenancy?.OpenBondReceived} OWING`}
+          textLink={"https://app.propertyme.com/#/property/card/" + id}
+        />
+      )}
+      <BackButton />
     </div>
   );
 };

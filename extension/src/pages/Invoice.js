@@ -1,29 +1,46 @@
-import Tasks from './Tasks';
-import ListItem from '../components/ListItem';
+import ListItem from "../components/ListItem";
+import { useEffect, useState } from "react";
+import { instance } from "../store/api";
+import BackButton from "../components/BackButton";
 
-const Invoice = () => {
+const Invoice = ({ id }) => {
+  const [detailInfo, setDetailInfo] = useState(null);
+
+  const getDetail = () => {
+    instance.get("/lots/" + id + "/detail").then((res) => {
+      setDetailInfo(res);
+    });
+  };
+
+  useEffect(() => {
+    getDetail();
+  }, []);
   return (
     <div className="App">
-      <ListItem
-        linkText={"Invoice"}
-        link={Tasks}
-        subText={"NO PENDING INVOICES"}
-      />
-      <ListItem
-        linkText={"Invoice"}
-        link={Tasks}
-        subText={() => (
-          <div>
-            <div>INV - $160.23 - DUE 14-11</div>
-            <div>INV - $160.23 - 5d ARREARS</div>
-          </div>
-        )}
-      />
-      <ListItem
-        linkText={"Invoice"}
-        link={Tasks}
-        subText={"INV - $160.23 - 5d ARREARS"}
-      />
+      {!detailInfo && (
+        <ListItem
+          linkText={"Invoice"}
+          subText={"NO PENDING INVOICES"}
+          textLink={"https://app.propertyme.com/#/property/card/" + id}
+        />
+      )}
+      {detailInfo && (
+        <ListItem
+          linkText={"Invoice"}
+          textLink={"https://app.propertyme.com/#/property/card/" + id}
+          subText={() => (
+            <div>
+              {detailInfo?.Tenancy?.InvoiceDaysInArrears && (
+                <div>
+                  INV - ${detailInfo?.Tenancy?.RentAmount} -{" "}
+                  {detailInfo?.Tenancy?.InvoiceDaysInArrears}d ARREARS
+                </div>
+              )}
+            </div>
+          )}
+        />
+      )}
+      <BackButton />
     </div>
   );
 };

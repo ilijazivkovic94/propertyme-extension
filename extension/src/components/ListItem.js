@@ -1,6 +1,6 @@
 import { Link } from "react-chrome-extension-router";
 
-const ListItem = ({ linkText, link, subText, subLink, rate }) => {
+const ListItem = ({ linkText, subText, subLink, rate, textLink }) => {
   return (
     <div
       style={{
@@ -19,7 +19,7 @@ const ListItem = ({ linkText, link, subText, subLink, rate }) => {
           fontSize: 16,
         }}
       >
-        <Link component={link} style={{ color: "#88CBB7", fontWeight: "bold" }}>
+        <Link style={{ color: "#88CBB7", fontWeight: "bold" }} onClick={() => window.parent.location.href = textLink}>
           {linkText}
         </Link>
       </div>
@@ -29,10 +29,11 @@ const ListItem = ({ linkText, link, subText, subLink, rate }) => {
           flex: rate && rate[1] ? rate[1] : 1,
           fontSize: 16,
           color: "white",
+          textAlign: "left",
         }}
       >
         {subLink ? (
-          <Link component={subLink} style={{ color: "white", fontStyle: "italic" }}>
+          <Link style={{ color: "white", fontStyle: "italic" }} onClick={() => window.parent.location.href = subLink}>
             {subText}
           </Link>
         ) : (
