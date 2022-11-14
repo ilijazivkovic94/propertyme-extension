@@ -3,7 +3,7 @@ import Rent from "../pages/Rent";
 import Bond from "../pages/Bond";
 import Invoice from "../pages/Invoice";
 
-const Tenancy = ({ name, subtitle, rent, link, id }) => {
+const Tenancy = ({ name, subtitle, rent, bond, invoice, link, id }) => {
   return (
     <div
       style={{
@@ -103,7 +103,7 @@ const Tenancy = ({ name, subtitle, rent, link, id }) => {
             component={Bond}
             props={{ id }}
           >
-            Click Here
+            {bond}
           </Link>
         </div>
       </div>
@@ -145,7 +145,7 @@ const Tenancy = ({ name, subtitle, rent, link, id }) => {
             component={Invoice}
             props={{ id }}
           >
-            Click Here
+            {invoice}
           </Link>
         </div>
       </div>

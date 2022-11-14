@@ -31,13 +31,13 @@ function insertButton() {
   
   let propertyLink = '';
   let properties = '';
-  if (window.location.href.indexOf('/card/') > -1) {
+  if (window.location.href.indexOf('/card/') > -1 || window.location.href.indexOf('/folio/') > -1) {
     const allLinks = document.querySelectorAll('#content-inner a');
     allLinks.forEach(link => {
-      if (link.href.indexOf('/property/card') > -1) {
-        propertyLink = link.href;
-        const propertyAry = link.href.split('/property/card/');
-        properties += propertyAry[1] + '::';
+      if (link.href.indexOf('/property/') > -1 && link.href.indexOf('/property/list') < 0) {
+        propertyLink = link.href.split('?')[0];
+        const propertyAry = link.href.split('?')[0].split('/');
+        properties += propertyAry[propertyAry.length - 1] + '::';
       }
     });
   }
@@ -54,8 +54,8 @@ function insertButton() {
     
   modal.innerHTML = `
         <div id="property_me_extension_header">
-            <img src="${(propertyLink || window.location.href.indexOf('/property/card') > -1) ? logo : document.querySelector('.img-circle.avatar-non-retina').src}" id="property_me_extension_header_toggle" style="display: block;${(propertyLink || window.location.href.indexOf('/property/card') > -1) ? 'border-radius: 0%' : 'border-radius: 50%'}" />
-            <img id="property_me_externsion_avatar" src="${(propertyLink || window.location.href.indexOf('/property/card') > -1) ? document.querySelector('.img-circle.avatar-non-retina').src : logo}" />
+            <img src="${(propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1) ? logo : document.querySelector('.img-circle.avatar-non-retina').src}" id="property_me_extension_header_toggle" style="display: block;${(propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0)) ? 'border-radius: 0%' : 'border-radius: 50%'}" />
+            <img id="property_me_externsion_avatar" src="${(propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0)) ? document.querySelector('.img-circle.avatar-non-retina').src : logo}" />
         </div>
         <div id="property_me_extension_content">
             <iframe src="${page_url}" id="property_me_extension_content_iframe" />
@@ -89,6 +89,9 @@ function insertButton() {
       const content_container = document.querySelector("#property_me_extension_content");
       const avatar = document.querySelector("#property_me_externsion_avatar");
       badge = document.querySelector('a[data-test-id="inbox-menu"] .badge');
+      if (!content_container.style.display) {
+        content_container.style.display = 'none';
+      }
 
       document.querySelector(
         "#property_me_extension_header"
@@ -108,6 +111,18 @@ function insertButton() {
         "/extension/build/index.html?url=" + encodeURIComponent(window.location.href) + "&propertyURL=" + encodeURIComponent(propertyLink) + '&unread=' + (badge ? badge.innerText : 0) + "&showHome=" + showHome + '&properties=' + properties + "&updated=" + (new Date().getTime())
       );
       document.querySelector("#property_me_extension_content_iframe").src = iframe_url;
+
+      if (propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1) {
+        document.querySelector('#property_me_extension_header_toggle').src = logo;
+        avatar.src = document.querySelector('.img-circle.avatar-non-retina').src;
+        document.querySelector('#property_me_extension_header_toggle').style.borderRadius = '0%';
+        avatar.style.borderRadius = '50%';
+      } else {
+        document.querySelector('#property_me_extension_header_toggle').src = document.querySelector('.img-circle.avatar-non-retina').src;
+        avatar.src = logo;
+        document.querySelector('#property_me_extension_header_toggle').style.borderRadius = '50%';
+        avatar.style.borderRadius = '0%';
+      }
     });
 
   document
@@ -118,18 +133,32 @@ function insertButton() {
         "/extension/build/index.html?url=" + encodeURIComponent(window.location.href) + "&propertyURL=" + encodeURIComponent(propertyLink) + '&unread=' + (badge ? badge.innerText : 0) + '&showHome=' + showHome + '&properties=' + properties + "&updated=" + (new Date().getTime())
       );
       document.querySelector("#property_me_extension_content_iframe").src = iframe_url;
+      
+      const avatar = document.querySelector("#property_me_externsion_avatar");
+      const logoImg = document.querySelector("#property_me_extension_header_toggle");
+      const avatarSrc = avatar.src;
+      avatar.src = logoImg.src;
+      logoImg.src = avatarSrc;
+      if (showHome) {
+        avatar.style.borderRadius = '0%';
+        logoImg.style.borderRadius = '50%';
+      } else {
+        avatar.style.borderRadius = '50%';
+        logoImg.style.borderRadius = '0%';
+      }
     });
   window.addEventListener("popstate", function () {
     setTimeout(() => {
+      showHome = false;
       propertyLink = '';
       properties = '';
-      if (window.location.href.indexOf('/card/') > -1) {
+      if (window.location.href.indexOf('/card/') > -1 || window.location.href.indexOf('/folio/') > -1) {
         const allLinks = document.querySelectorAll('#content-inner a');
         allLinks.forEach(link => {
-          if (link.href.indexOf('/property/card') > -1) {
-            propertyLink = link.href;
-            const propertyAry = link.href.split('/property/card/');
-            properties += propertyAry[1] + '::';
+          if (link.href.indexOf('/property/') > -1 && link.href.indexOf('/property/list') < 0) {
+            propertyLink = link.href.split('?')[0];
+            const propertyAry = link.href.split('?')[0].split('/');
+            properties += propertyAry[propertyAry.length - 1] + '::';
           }
         });
       }
@@ -137,14 +166,16 @@ function insertButton() {
         "/extension/build/index.html?url=" + encodeURIComponent(window.location.href) + "&propertyURL=" + encodeURIComponent(propertyLink) + '&unread=' + (badge ? badge.innerText : 0) + "&showHome=" + showHome + '&properties=' + properties + "&updated=" + (new Date().getTime())
       );
       document.querySelector("#property_me_extension_content_iframe").src = iframe_url;
-      const image_url = (propertyLink || window.location.href.indexOf('/property/card') > -1) ? logo : document.querySelector('.img-circle.avatar-non-retina').src;
-      const avatar_url = (propertyLink || window.location.href.indexOf('/property/card') > -1) ? document.querySelector('.img-circle.avatar-non-retina').src : logo;
+      const image_url = (propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1) ? logo : document.querySelector('.img-circle.avatar-non-retina').src;
+      const avatar_url = (propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1) ? document.querySelector('.img-circle.avatar-non-retina').src : logo;
       document.querySelector('#property_me_extension_header_toggle').src = image_url;
       document.querySelector('#property_me_externsion_avatar').src = avatar_url;
-      if (propertyLink || window.location.href.indexOf('/property/card') > -1) {
+      if (propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1) {
         document.querySelector('#property_me_extension_header_toggle').style.borderRadius = '0%';
+        document.querySelector('#property_me_externsion_avatar').style.borderRadius = '50%';
       } else {
         document.querySelector('#property_me_extension_header_toggle').style.borderRadius = '50%';
+        document.querySelector('#property_me_externsion_avatar').style.borderRadius = '0%';
       }
     }, 2000);
   });
