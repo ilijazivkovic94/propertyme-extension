@@ -2,20 +2,30 @@ import { useEffect, useState } from "react";
 import Tenancy from "../components/Tenancy";
 import { instance } from "../store/api";
 
-const Tenancies = () => {
+const Tenancies = ({ id, properties }) => {
   const [isLoading, setLoading] = useState(false);
   const [tenancyList, setTenancyList] = useState([]);
 
-  const getTenancies = () => {
-    setLoading(true);
-    instance.get("/lots?Timestamp=" + new Date().getTime()).then((res) => {
-      setTenancyList(res);
-      setLoading(false);
-      window.parent.postMessage(document.querySelector('#tenancy_list').scrollHeight);
-    });
-  };
-
   useEffect(() => {
+    const getTenancies = () => {
+      setLoading(true);
+      instance.get("/lots?Timestamp=" + new Date().getTime()).then((res) => {
+        let result = []
+        console.log(id);
+        if (id) {
+          result = res.filter(r => r.Id === id);
+        } else {
+          result = res;
+        }
+        let more = [];
+        if (properties.length > 0) {
+          more = res.filter(r => properties.includes(r.Id));
+        }
+        setTenancyList([...more, ...result]);
+        setLoading(false);
+        window.parent.postMessage(document.querySelector('#tenancy_list').scrollHeight);
+      });
+    };
     getTenancies();
   }, []);
   return (
@@ -26,7 +36,7 @@ const Tenancies = () => {
       {tenancyList.map((item) => (
         <Tenancy
           name={item.Reference}
-          subtitle={item.ManagerName}
+          subtitle={item.TenantContactReference}
           rent={`PAID TO - ${item.EffectivePaidTo}`}
           bond={"PAID UP TO DATE"}
           invoice={"NO PENDING INVOICES"}

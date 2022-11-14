@@ -25,10 +25,8 @@
 }
 
 #property_me_externsion_avatar{
-    padding: 5px;
     height: 60px;
     width: 60px;
-    border: 2px solid green;
     border-radius: 50%;
     color: green;
     font-weight: bold;
@@ -36,6 +34,11 @@
     font-size: 18px;
     justify-content: center;
     align-items: center;
+    display: none;
+}
+
+#property_me_extension_content{
+    display: none;
 }
 
 #property_me_extension_content iframe{

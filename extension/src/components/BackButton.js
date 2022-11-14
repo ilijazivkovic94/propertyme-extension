@@ -1,7 +1,7 @@
 import { Link } from "react-chrome-extension-router";
 import Tenancies from "../pages/Tenancies";
 
-const BackButton = () => {
+const BackButton = ({ id }) => {
   return (
     <div
       style={{
@@ -13,7 +13,7 @@ const BackButton = () => {
         marginTop: 15,
       }}
     >
-        <Link component={Tenancies} style={{ color: "#88CBB7", fontWeight: "bold" }}>
+        <Link component={Tenancies} props={{ id }} style={{ color: "#88CBB7", fontWeight: "bold" }}>
             Back
         </Link>
     </div>

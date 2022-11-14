@@ -8,7 +8,7 @@ import "./App.css";
 import Home from "./pages/Home";
 import Tenancies from "./pages/Tenancies";
 
-function App({ parent_url, property_url, unread }) {
+function App({ parent_url, property_url, unread, showHome, properties }) {
   if (!parent_url) {
     parent_url = "";
   }
@@ -22,11 +22,20 @@ function App({ parent_url, property_url, unread }) {
     const components = getComponentStack();
     console.log(`The stack has ${components.length} components on the stack`);
   });
+  let query = [];
+  if (parent_url.indexOf("%2Fproperty%2Fcard") > -1 || property_url) {
+    if (parent_url.indexOf("%2Fproperty%2Fcard%2F") > -1) {
+      query = parent_url.split("%2F");
+    }
+    if (property_url) {
+      query = property_url.split("%2F");
+    }
+  }
 
   return (
     <Router>
-      {(parent_url.indexOf("%2Fproperty%2F") > -1 || property_url) && <Tenancies />}
-      {(parent_url.indexOf("%2Fproperty%2F") === -1 && !property_url) && <Home unread={unread} />}
+      {(!showHome && (parent_url.indexOf("%2Fproperty%2Fcard") > -1 || property_url)) && <Tenancies id={query && query.length > 0 ? query[query.length - 1] : ''} properties={properties ? properties.substr(0, properties.length - 2).split('::') : []} />}
+      {(((parent_url.indexOf("%2Fproperty%2Fcard") > -1 || property_url) && showHome) || (parent_url.indexOf("%2Fproperty%2Fcard") === -1 && !property_url)) && <Home unread={unread} />}
     </Router>
   );
 }

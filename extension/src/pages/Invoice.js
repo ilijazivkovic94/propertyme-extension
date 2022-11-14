@@ -6,13 +6,12 @@ import BackButton from "../components/BackButton";
 const Invoice = ({ id }) => {
   const [detailInfo, setDetailInfo] = useState(null);
 
-  const getDetail = () => {
-    instance.get("/lots/" + id + "/detail").then((res) => {
-      setDetailInfo(res);
-    });
-  };
-
   useEffect(() => {
+    const getDetail = () => {
+      instance.get("/lots/" + id + "/detail").then((res) => {
+        setDetailInfo(res);
+      });
+    };
     getDetail();
   }, []);
   return (
@@ -40,7 +39,7 @@ const Invoice = ({ id }) => {
           )}
         />
       )}
-      <BackButton />
+      <BackButton id={id} />
     </div>
   );
 };

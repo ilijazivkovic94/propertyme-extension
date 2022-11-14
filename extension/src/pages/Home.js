@@ -53,7 +53,7 @@ const Home = ({ unread }) => {
       <ListItem
         linkText={"Inbox"}
         link={Tasks}
-        subText={(unread ? unread : 0) + " UNREAD"}
+        subText={(unread ? unread * 1 - 1 : 0) + " UNREAD"}
         textLink={"https://app.propertyme.com/#/message/inbox"}
       />
       <ListItem
@@ -78,22 +78,22 @@ const Home = ({ unread }) => {
         linkText={"Leases Renewals"}
         link={Tasks}
         subText={"CLICK HERE"}
-        subLink={"https://app.propertyme.com/#/property/list"}
-        textLink={"https://app.propertyme.com/#/property/list"}
+        subLink={"https://nsgorgau.sharepoint.com/:x:/r/sites/rentalsteam/_layouts/15/Doc.aspx?sourcedoc=%7B9349E6C9-66CE-4D05-8C12-D35A119387B1%7D&file=Lease%20Renewal%20Template.xlsx&action=default&mobileredirect=true&cid=fdca3f45-829b-41ce-8df4-a4f6059d0db0"}
+        textLink={"https://nsgorgau.sharepoint.com/:x:/r/sites/rentalsteam/_layouts/15/Doc.aspx?sourcedoc=%7B9349E6C9-66CE-4D05-8C12-D35A119387B1%7D&file=Lease%20Renewal%20Template.xlsx&action=default&mobileredirect=true&cid=fdca3f45-829b-41ce-8df4-a4f6059d0db0"}
       />
       <ListItem
         linkText={"My Applications"}
         link={Applications}
         subText={"CLICK HERE"}
-        subLink={"https://app.propertyme.com/#/property/list"}
-        textLink={"https://app.propertyme.com/#/property/list"}
+        subLink={"https://app.inspectrealestate.com.au/AppTracker2/Apps.aspx?menu=2"}
+        textLink={"https://app.inspectrealestate.com.au/AppTracker2/Apps.aspx?menu=2"}
       />
       <ListItem
         linkText={"Aura Rentals"}
         link={Rentals}
         subText={"CLICK HERE"}
-        subLink={"https://app.propertyme.com/#/property/list"}
-        textLink={"https://app.propertyme.com/#/property/list"}
+        subLink={"https://www.aurapropertysc.com.au/listings/?saleOrRental=Rental&type=Residential&order=dateListed-desc"}
+        textLink={"https://www.aurapropertysc.com.au/listings/?saleOrRental=Rental&type=Residential&order=dateListed-desc"}
       />
     </div>
   );
