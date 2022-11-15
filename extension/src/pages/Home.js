@@ -25,13 +25,13 @@ const Home = ({ unread }) => {
 
   const geJobsCounts = () => {
     instance.get('/dashboards/activities/Jobs').then(res => {
-      setJobsCount(res.DetailWidgets[0].Values[1].Quantity);
+      setJobsCount(res.DetailWidgets[0].Values[0].Quantity);
     });
   }
 
   const geTasksCounts = () => {
     instance.get('/dashboards/activities/Tasks').then(res => {
-      setTasksCount(res.DetailWidgets[0].Values[2].Quantity);
+      setTasksCount(res.DetailWidgets[0].Values[0].Quantity);
     });
   }
 
@@ -49,30 +49,35 @@ const Home = ({ unread }) => {
         link={Tasks}
         subText={`${tasksCount < 0 ? 0 : tasksCount} OVERDUE`}
         textLink={"https://app.propertyme.com/#/task/list"}
+        isSelf={'true'}
       />
       <ListItem
         linkText={"Inbox"}
         link={Tasks}
-        subText={(unread ? unread * 1 - 1 : 0) + " UNREAD"}
+        subText={(unread ? unread * 1 : 0) + " UNREAD"}
         textLink={"https://app.propertyme.com/#/message/inbox"}
+        isSelf={'true'}
       />
       <ListItem
         linkText={"Outbox"}
         link={Tasks}
         subText={`${outboxCount < 0 ? 0 : outboxCount} READY TO SEND`}
         textLink={"https://app.propertyme.com/#/message/list"}
+        isSelf={'true'}
       />
       <ListItem
         linkText={"Bills"}
         link={Tasks}
-        subText={`${billsCount < 0 ? 0 : billsCount} WAITING APPROVAL`}
+        subText={`${billsCount < 0 ? 0 : billsCount} Over Due`}
         textLink={"https://app.propertyme.com/#/bill/list"}
+        isSelf={'true'}
       />
       <ListItem
         linkText={"Jobs"}
         link={Tasks}
         subText={`${jobsCount < 0 ? 0 : jobsCount} Active Jobs`}
         textLink={"https://app.propertyme.com/#/jobtask/list"}
+        isSelf={'true'}
       />
       <ListItem
         linkText={"Leases Renewals"}

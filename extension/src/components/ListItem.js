@@ -1,6 +1,6 @@
 import { Link } from "react-chrome-extension-router";
 
-const ListItem = ({ linkText, subText, subLink, rate, textLink }) => {
+const ListItem = ({ linkText, subText, subLink, rate, textLink, isSelf }) => {
   return (
     <div
       style={{
@@ -19,7 +19,13 @@ const ListItem = ({ linkText, subText, subLink, rate, textLink }) => {
           fontSize: 16,
         }}
       >
-        <Link style={{ color: "#88CBB7", fontWeight: "bold" }} onClick={() => window.parent.location.href = textLink}>
+        <Link style={{ color: "#88CBB7", fontWeight: "bold" }} onClick={() => {
+          if (isSelf) {
+            window.parent.location.href = textLink;
+          } else {
+            window.parent.postMessage({ link: textLink, type: 'open' }, 'https://app.propertyme.com');
+          }
+        }}>
           {linkText}
         </Link>
       </div>
@@ -33,7 +39,13 @@ const ListItem = ({ linkText, subText, subLink, rate, textLink }) => {
         }}
       >
         {subLink ? (
-          <Link style={{ color: "white", fontStyle: "italic" }} onClick={() => window.parent.location.href = subLink}>
+          <Link style={{ color: "white", fontStyle: "italic" }} onClick={() => {
+            if (isSelf) {
+              window.parent.location.href = textLink;
+            } else {
+              window.parent.postMessage({ link: subLink, type: 'open' }, 'https://app.propertyme.com');
+            }
+          }}>
             {subText}
           </Link>
         ) : (

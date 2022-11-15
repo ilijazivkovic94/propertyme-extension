@@ -8,7 +8,7 @@ import "./App.css";
 import Home from "./pages/Home";
 import Tenancies from "./pages/Tenancies";
 
-function App({ parent_url, property_url, unread, showHome, properties }) {
+function App({ parent_url, property_url, unread, showHome, properties, contacts }) {
   if (!parent_url) {
     parent_url = "";
   }
@@ -59,6 +59,7 @@ function App({ parent_url, property_url, unread, showHome, properties }) {
         ((parent_url.indexOf("%2Fproperty%2F") > -1 &&
           parent_url.indexOf("%2Fproperty%2Flist") < 0) ||
           property_url ||
+          parent_url.indexOf("%2Fcontact%2Fedit%2F") > -1 ||
           properties) && (
           <Tenancies
             id={query && query.length > 0 ? query[query.length - 1] : ""}
@@ -67,16 +68,23 @@ function App({ parent_url, property_url, unread, showHome, properties }) {
                 ? properties.substr(0, properties.length - 2).split("::")
                 : []
             }
+            contacts={
+              contacts
+                ? contacts.substr(0, contacts.length - 2).split("::")
+                : []
+            }
             tenant_id={tenant_query[tenant_query.length - 1]}
           />
         )}
       {((((parent_url.indexOf("%2Fproperty%2F") > -1 &&
         parent_url.indexOf("%2Fproperty%2Flist") < 0) ||
         property_url ||
+        parent_url.indexOf("%2Fcontact%2Fedit%2F") > -1 ||
         properties) &&
         showHome) ||
         ((parent_url.indexOf("%2Fproperty%2F") === -1 ||
           parent_url.indexOf("%2Fproperty%2Flist") > -1) &&
+          parent_url.indexOf('%2Fcontact%2Fedit') < 0 &&
           !property_url)) && <Home unread={unread} />}
     </Router>
   );

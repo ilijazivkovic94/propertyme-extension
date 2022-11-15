@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import Tenancy from "../components/Tenancy";
 import { instance } from "../store/api";
+import moment from 'moment';
 
-const Tenancies = ({ id, properties, tenant_id }) => {
+const Tenancies = ({ id, properties, contacts }) => {
   const [isLoading, setLoading] = useState(false);
   const [tenancyList, setTenancyList] = useState([]);
 
@@ -19,6 +20,9 @@ const Tenancies = ({ id, properties, tenant_id }) => {
         if (properties.length > 0) {
           result = res.filter(r => properties.includes(r.Id));
         }
+        if (contacts.length > 0) {
+          result = res.filter(r => contacts.includes(r.TenantContactId) || contacts.includes(r.OwnerContactId));
+        }
         setTenancyList([...result]);
         for (let i = 0; i < result.length; i++) {
           const item = result[i];
@@ -32,6 +36,7 @@ const Tenancies = ({ id, properties, tenant_id }) => {
     };
     getTenancies();
   }, []);
+  
   return (
     <div id="tenancy_list">
       {isLoading && !tenancyList.length && (
@@ -41,8 +46,8 @@ const Tenancies = ({ id, properties, tenant_id }) => {
         <Tenancy
           name={item.Reference}
           subtitle={item.TenantContactReference}
-          rent={`PAID TO - ${item.EffectivePaidTo}`}
-          bond={(!item.Tenancy || item.Tenancy && item.Tenancy.BondArrears === 0) ? "PAID UP TO DATE" : "IN ARREARS - $" + (item.Tenancy?.BondAmount - item.Tenancy?.OpenBondReceived)}
+          rent={`PAID TO - ${moment(item.EffectivePaidTo).format('ddd DD/MM/YY')}`}
+          bond={(!item.Tenancy || item.Tenancy && item.Tenancy.BondArrears === 0) ? "PAID UP TO DATE" : "IN ARREARS - $" + (item.Tenancy?.BondArrears) + " OWING"}
           invoice={(!item.Tenancy || item.Tenancy && item.Tenancy.InvoiceArrears === 0) ? "NO PENDING INVOICES" : "INV - $" + item.Tenancy?.InvoiceArrears + " - " + item.Tenancy?.InvoiceDaysInArrears + "d ARREARS"}
           link={'https://app.propertyme.com/#/property/card/' + item.Id}
           id={item.Id}

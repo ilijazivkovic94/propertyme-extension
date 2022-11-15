@@ -31,6 +31,7 @@ function insertButton() {
   
   let propertyLink = '';
   let properties = '';
+  let contacts = '';
   if (window.location.href.indexOf('/card/') > -1 || window.location.href.indexOf('/folio/') > -1) {
     const allLinks = document.querySelectorAll('#content-inner a');
     allLinks.forEach(link => {
@@ -41,9 +42,17 @@ function insertButton() {
       }
     });
   }
+  if (window.location.href.indexOf('/property/tenant/edit/') > -1) {
+    const linkAry = window.location.href.split('?')[0].split('/property/tenant/edit/');
+    properties += linkAry[linkAry.length - 1] + '::';
+  }
+  if (window.location.href.indexOf('/contact/edit/') > -1) {
+    const linkAry = window.location.href.split('?')[0].split('/contact/edit/');
+    contacts += linkAry[linkAry.length - 1] + '::';
+  }
   let badge = document.querySelector('a[data-test-id="inbox-menu"] .badge');
   const page_url = chrome.runtime.getURL(
-    "/extension/build/index.html?url=" + url + "&propertyURL=" + encodeURIComponent(propertyLink) + '&unread=' + (badge ? badge.innerText : 0) + '&showHome' + showHome + '&properties=' + properties
+    "/extension/build/index.html?url=" + url + "&propertyURL=" + encodeURIComponent(propertyLink) + '&unread=' + (badge ? badge.innerText : 0) + '&showHome' + showHome + '&properties=' + properties + '&contacts=' + contacts
   );
   const logo = chrome.runtime.getURL("/extension/public/images/logo.png");
 
@@ -51,11 +60,12 @@ function insertButton() {
   mask.setAttribute("id", "property_me_externsion_container");
   let modal = document.createElement("div");
   modal.setAttribute("id", "property_me_externsion_popup_button");
+  modal.setAttribute("draggable", "true");
     
   modal.innerHTML = `
         <div id="property_me_extension_header">
-            <img src="${(propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1) ? logo : document.querySelector('.img-circle.avatar-non-retina').src}" id="property_me_extension_header_toggle" style="display: block;${(propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0)) ? 'border-radius: 0%' : 'border-radius: 50%'}" />
-            <img id="property_me_externsion_avatar" src="${(propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0)) ? document.querySelector('.img-circle.avatar-non-retina').src : logo}" />
+            <img draggable="false" src="${(propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1 || window.location.href.indexOf('/contact/edit/') > -1) ? logo : document.querySelector('.img-circle.avatar-non-retina').src}" id="property_me_extension_header_toggle" style="display: block;${(propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/contact/edit/') > -1) ? 'border-radius: 0%' : 'border-radius: 50%'}" />
+            <img draggable="false" id="property_me_externsion_avatar" src="${(propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0)) ? document.querySelector('.img-circle.avatar-non-retina').src : logo}" />
         </div>
         <div id="property_me_extension_content">
             <iframe src="${page_url}" id="property_me_extension_content_iframe" />
@@ -76,8 +86,9 @@ function insertButton() {
     messageEvent,
     function (e) {
       console.log("parent received message!:  ", e.data);
-      document.getElementById("property_me_extension_content_iframe").height =
-        e.data + "px";
+      if (e.data.type === 'open') {
+        window.open(e.data.link, '_blank');
+      }
     },
     false
   );
@@ -108,11 +119,11 @@ function insertButton() {
       avatar.style.display = content.style.display === "block" ? "block" : "none";
 
       const iframe_url = chrome.runtime.getURL(
-        "/extension/build/index.html?url=" + encodeURIComponent(window.location.href) + "&propertyURL=" + encodeURIComponent(propertyLink) + '&unread=' + (badge ? badge.innerText : 0) + "&showHome=" + showHome + '&properties=' + properties + "&updated=" + (new Date().getTime())
+        "/extension/build/index.html?url=" + encodeURIComponent(window.location.href) + "&propertyURL=" + encodeURIComponent(propertyLink) + '&unread=' + (badge ? badge.innerText : 0) + "&showHome=" + showHome + '&properties=' + properties + '&contacts=' + contacts + "&updated=" + (new Date().getTime())
       );
       document.querySelector("#property_me_extension_content_iframe").src = iframe_url;
 
-      if (propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1) {
+      if (propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1 || window.location.href.indexOf('/contact/edit/') > -1) {
         document.querySelector('#property_me_extension_header_toggle').src = logo;
         avatar.src = document.querySelector('.img-circle.avatar-non-retina').src;
         document.querySelector('#property_me_extension_header_toggle').style.borderRadius = '0%';
@@ -128,9 +139,14 @@ function insertButton() {
   document
     .querySelector('#property_me_externsion_avatar')
     .addEventListener("click", () => {
+      if (propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1 || window.location.href.indexOf('/contact/edit/') > -1) {
+        
+      } else {
+        return;
+      }
       showHome = !showHome;
       const iframe_url = chrome.runtime.getURL(
-        "/extension/build/index.html?url=" + encodeURIComponent(window.location.href) + "&propertyURL=" + encodeURIComponent(propertyLink) + '&unread=' + (badge ? badge.innerText : 0) + '&showHome=' + showHome + '&properties=' + properties + "&updated=" + (new Date().getTime())
+        "/extension/build/index.html?url=" + encodeURIComponent(window.location.href) + "&propertyURL=" + encodeURIComponent(propertyLink) + '&unread=' + (badge ? badge.innerText : 0) + '&showHome=' + showHome + '&properties=' + properties + '&contacts=' + contacts + "&updated=" + (new Date().getTime())
       );
       document.querySelector("#property_me_extension_content_iframe").src = iframe_url;
       
@@ -139,6 +155,7 @@ function insertButton() {
       const avatarSrc = avatar.src;
       avatar.src = logoImg.src;
       logoImg.src = avatarSrc;
+      
       if (showHome) {
         avatar.style.borderRadius = '0%';
         logoImg.style.borderRadius = '50%';
@@ -152,6 +169,7 @@ function insertButton() {
       showHome = false;
       propertyLink = '';
       properties = '';
+      contacts = '';
       if (window.location.href.indexOf('/card/') > -1 || window.location.href.indexOf('/folio/') > -1) {
         const allLinks = document.querySelectorAll('#content-inner a');
         allLinks.forEach(link => {
@@ -162,21 +180,47 @@ function insertButton() {
           }
         });
       }
+      if (window.location.href.indexOf('/property/tenant/edit/') > -1) {
+        const linkAry = window.location.href.split('?')[0].split('/property/tenant/edit/');
+        properties += linkAry[linkAry.length - 1] + '::';
+      }
+      if (window.location.href.indexOf('/contact/edit/') > -1) {
+        const linkAry = window.location.href.split('?')[0].split('/contact/edit/');
+        contacts += linkAry[linkAry.length - 1] + '::';
+      }
       const iframe_url = chrome.runtime.getURL(
-        "/extension/build/index.html?url=" + encodeURIComponent(window.location.href) + "&propertyURL=" + encodeURIComponent(propertyLink) + '&unread=' + (badge ? badge.innerText : 0) + "&showHome=" + showHome + '&properties=' + properties + "&updated=" + (new Date().getTime())
+        "/extension/build/index.html?url=" + encodeURIComponent(window.location.href) + "&propertyURL=" + encodeURIComponent(propertyLink) + '&unread=' + (badge ? badge.innerText : 0) + "&showHome=" + showHome + '&properties=' + properties + '&contacts=' + contacts + "&updated=" + (new Date().getTime())
       );
       document.querySelector("#property_me_extension_content_iframe").src = iframe_url;
-      const image_url = (propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1) ? logo : document.querySelector('.img-circle.avatar-non-retina').src;
-      const avatar_url = (propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1) ? document.querySelector('.img-circle.avatar-non-retina').src : logo;
+      const image_url = (propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1 || window.location.href.indexOf('/contact/edit/') > -1) ? logo : document.querySelector('.img-circle.avatar-non-retina').src;
+      const avatar_url = (propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1 || window.location.href.indexOf('/contact/edit/') > -1) ? document.querySelector('.img-circle.avatar-non-retina').src : logo;
       document.querySelector('#property_me_extension_header_toggle').src = image_url;
       document.querySelector('#property_me_externsion_avatar').src = avatar_url;
-      if (propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1) {
+      if (propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1 || window.location.href.indexOf('/contact/edit/') > -1) {
         document.querySelector('#property_me_extension_header_toggle').style.borderRadius = '0%';
         document.querySelector('#property_me_externsion_avatar').style.borderRadius = '50%';
       } else {
         document.querySelector('#property_me_extension_header_toggle').style.borderRadius = '50%';
         document.querySelector('#property_me_externsion_avatar').style.borderRadius = '0%';
       }
-    }, 2000);
+    }, 3000);
   });
+
+  document
+    .querySelector('#property_me_externsion_popup_button')
+    .addEventListener('dragstart', function(e) {
+      e.dataTransfer.setData("application/my-app", e.target.id);
+    });
+
+  document
+  .querySelector('body')
+  .addEventListener('dragover', function(e) {
+    document.querySelector('#property_me_externsion_popup_button').style.top = (e.clientY - 40) + 'px';
+   });
+
+  document
+  .querySelector('#property_me_externsion_popup_button')
+  .addEventListener('drop', function(e) {
+    console.log(e);
+   });
 }

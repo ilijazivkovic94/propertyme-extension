@@ -98,13 +98,7 @@ const Tenancy = ({ name, subtitle, rent, bond, invoice, link, id }) => {
             color: "white",
           }}
         >
-          <Link
-            style={{ color: "#88CBB7", fontWeight: "bold" }}
-            component={Bond}
-            props={{ id }}
-          >
-            {bond}
-          </Link>
+          {bond}
         </div>
       </div>
       <div
@@ -140,13 +134,7 @@ const Tenancy = ({ name, subtitle, rent, bond, invoice, link, id }) => {
             color: "white",
           }}
         >
-          <Link
-            style={{ color: "#88CBB7", fontWeight: "bold" }}
-            component={Invoice}
-            props={{ id }}
-          >
-            {invoice}
-          </Link>
+          {invoice}
         </div>
       </div>
     </div>
