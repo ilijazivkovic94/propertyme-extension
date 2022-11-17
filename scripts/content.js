@@ -25,9 +25,36 @@ window.document.onload = function(e) {
   console.log(e);
 }
 
-function insertButton() {
+async function getMessagesCount() {
+  let result = {
+    inbox: 0,
+    outbox: 0,
+    bills: 0,
+  };
+
+  const inbox_result = await fetch('https://app.propertyme.com/api/comms/threads/unread?format=json', {
+    method: 'GET',
+  }).then(res => res.json());
+  result.inbox = inbox_result?.Unread || 0;
+
+  const outbox_result = await fetch('https://app.propertyme.com/api/comms/messages/summary?format=json', {
+    method: 'GET',
+  }).then(res => res.json());
+  result.outbox = outbox_result?.Emails || 0;
+
+  const bills_result = await fetch('https://app.propertyme.com/api/financial/bills/count-drafts?format=json', {
+    method: 'GET',
+  }).then(res => res.json());
+  result.bills = bills_result || 0;
+  console.log(encodeURIComponent(JSON.stringify(result)));
+  return encodeURIComponent(JSON.stringify(result));
+}
+
+async function insertButton() {
   let showHome = false;
   const url = encodeURIComponent(window.location.href);
+
+  let count_result = await getMessagesCount();
   
   let propertyLink = '';
   let properties = '';
@@ -50,9 +77,13 @@ function insertButton() {
     const linkAry = window.location.href.split('?')[0].split('/contact/edit/');
     contacts += linkAry[linkAry.length - 1] + '::';
   }
+  if (window.location.href.indexOf('/portal-access/folio-invites/') > -1) {
+    const linkAry = window.location.href.split('?')[1].split('=');
+    contacts += linkAry[linkAry.length - 1] + '::';
+  }
   let badge = document.querySelector('a[data-test-id="inbox-menu"] .badge');
   const page_url = chrome.runtime.getURL(
-    "/extension/build/index.html?url=" + url + "&propertyURL=" + encodeURIComponent(propertyLink) + '&unread=' + (badge ? badge.innerText : 0) + '&showHome' + showHome + '&properties=' + properties + '&contacts=' + contacts
+    "/extension/build/index.html?url=" + url + "&propertyURL=" + encodeURIComponent(propertyLink) + '&unread=' + (badge ? badge.innerText : 0) + '&showHome' + showHome + '&properties=' + properties + '&contacts=' + contacts + '&data=' + count_result
   );
   const logo = chrome.runtime.getURL("/extension/public/images/logo.png");
 
@@ -64,8 +95,8 @@ function insertButton() {
     
   modal.innerHTML = `
         <div id="property_me_extension_header">
-            <img draggable="false" src="${(propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1 || window.location.href.indexOf('/contact/edit/') > -1) ? logo : document.querySelector('.img-circle.avatar-non-retina').src}" id="property_me_extension_header_toggle" style="display: block;${(propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/contact/edit/') > -1) ? 'border-radius: 0%' : 'border-radius: 50%'}" />
-            <img draggable="false" id="property_me_externsion_avatar" src="${(propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0)) ? document.querySelector('.img-circle.avatar-non-retina').src : logo}" />
+            <img draggable="false" src="${(propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1 || window.location.href.indexOf('/contact/edit/') > -1 || window.location.href.indexOf('/portal-access/folio-invites/') > -1) ? logo : document.querySelector('.img-circle.avatar-non-retina').src}" id="property_me_extension_header_toggle" style="display: block;${(propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/contact/edit/') > -1 || window.location.href.indexOf('/portal-access/folio-invites/') > -1) ? 'border-radius: 0%' : 'border-radius: 50%'}" />
+            <img draggable="false" id="property_me_externsion_avatar" src="${(propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1 || window.location.href.indexOf('/contact/edit/') > -1 || window.location.href.indexOf('/portal-access/folio-invites/') > -1) ? document.querySelector('.img-circle.avatar-non-retina').src : logo}" />
         </div>
         <div id="property_me_extension_content">
             <iframe src="${page_url}" id="property_me_extension_content_iframe" />
@@ -119,11 +150,11 @@ function insertButton() {
       avatar.style.display = content.style.display === "block" ? "block" : "none";
 
       const iframe_url = chrome.runtime.getURL(
-        "/extension/build/index.html?url=" + encodeURIComponent(window.location.href) + "&propertyURL=" + encodeURIComponent(propertyLink) + '&unread=' + (badge ? badge.innerText : 0) + "&showHome=" + showHome + '&properties=' + properties + '&contacts=' + contacts + "&updated=" + (new Date().getTime())
+        "/extension/build/index.html?url=" + encodeURIComponent(window.location.href) + "&propertyURL=" + encodeURIComponent(propertyLink) + '&unread=' + (badge ? badge.innerText : 0) + "&showHome=" + showHome + '&properties=' + properties + '&contacts=' + contacts + '&data=' + count_result + "&updated=" + (new Date().getTime())
       );
       document.querySelector("#property_me_extension_content_iframe").src = iframe_url;
 
-      if (propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1 || window.location.href.indexOf('/contact/edit/') > -1) {
+      if (propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1 || window.location.href.indexOf('/contact/edit/') > -1 || window.location.href.indexOf('/portal-access/folio-invites/') > -1) {
         document.querySelector('#property_me_extension_header_toggle').src = logo;
         avatar.src = document.querySelector('.img-circle.avatar-non-retina').src;
         document.querySelector('#property_me_extension_header_toggle').style.borderRadius = '0%';
@@ -139,14 +170,14 @@ function insertButton() {
   document
     .querySelector('#property_me_externsion_avatar')
     .addEventListener("click", () => {
-      if (propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1 || window.location.href.indexOf('/contact/edit/') > -1) {
+      if (propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1 || window.location.href.indexOf('/contact/edit/') > -1 || window.location.href.indexOf('/portal-access/folio-invites/') > -1) {
         
       } else {
         return;
       }
       showHome = !showHome;
       const iframe_url = chrome.runtime.getURL(
-        "/extension/build/index.html?url=" + encodeURIComponent(window.location.href) + "&propertyURL=" + encodeURIComponent(propertyLink) + '&unread=' + (badge ? badge.innerText : 0) + '&showHome=' + showHome + '&properties=' + properties + '&contacts=' + contacts + "&updated=" + (new Date().getTime())
+        "/extension/build/index.html?url=" + encodeURIComponent(window.location.href) + "&propertyURL=" + encodeURIComponent(propertyLink) + '&unread=' + (badge ? badge.innerText : 0) + '&showHome=' + showHome + '&properties=' + properties + '&contacts=' + contacts + '&data=' + count_result + "&updated=" + (new Date().getTime())
       );
       document.querySelector("#property_me_extension_content_iframe").src = iframe_url;
       
@@ -189,14 +220,14 @@ function insertButton() {
         contacts += linkAry[linkAry.length - 1] + '::';
       }
       const iframe_url = chrome.runtime.getURL(
-        "/extension/build/index.html?url=" + encodeURIComponent(window.location.href) + "&propertyURL=" + encodeURIComponent(propertyLink) + '&unread=' + (badge ? badge.innerText : 0) + "&showHome=" + showHome + '&properties=' + properties + '&contacts=' + contacts + "&updated=" + (new Date().getTime())
+        "/extension/build/index.html?url=" + encodeURIComponent(window.location.href) + "&propertyURL=" + encodeURIComponent(propertyLink) + '&unread=' + (badge ? badge.innerText : 0) + "&showHome=" + showHome + '&properties=' + properties + '&contacts=' + contacts + '&data=' + count_result + "&updated=" + (new Date().getTime())
       );
       document.querySelector("#property_me_extension_content_iframe").src = iframe_url;
-      const image_url = (propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1 || window.location.href.indexOf('/contact/edit/') > -1) ? logo : document.querySelector('.img-circle.avatar-non-retina').src;
-      const avatar_url = (propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1 || window.location.href.indexOf('/contact/edit/') > -1) ? document.querySelector('.img-circle.avatar-non-retina').src : logo;
+      const image_url = (propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1 || window.location.href.indexOf('/contact/edit/') > -1 || window.location.href.indexOf('/portal-access/folio-invites/') > -1) ? logo : document.querySelector('.img-circle.avatar-non-retina').src;
+      const avatar_url = (propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1 || window.location.href.indexOf('/contact/edit/') > -1 || window.location.href.indexOf('/portal-access/folio-invites/') > -1) ? document.querySelector('.img-circle.avatar-non-retina').src : logo;
       document.querySelector('#property_me_extension_header_toggle').src = image_url;
       document.querySelector('#property_me_externsion_avatar').src = avatar_url;
-      if (propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1 || window.location.href.indexOf('/contact/edit/') > -1) {
+      if (propertyLink || (window.location.href.indexOf('/property/') > -1 && window.location.href.indexOf('/property/list') < 0) || window.location.href.indexOf('/folio/') > -1 || window.location.href.indexOf('/contact/edit/') > -1 || window.location.href.indexOf('/portal-access/folio-invites/') > -1) {
         document.querySelector('#property_me_extension_header_toggle').style.borderRadius = '0%';
         document.querySelector('#property_me_externsion_avatar').style.borderRadius = '50%';
       } else {

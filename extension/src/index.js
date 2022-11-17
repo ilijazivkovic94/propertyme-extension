@@ -27,6 +27,7 @@ root.render(
       showHome={query_params[3].split("=")[1] === "true" ? true : false}
       properties={query_params[4].split("=")[1]}
       contacts={query_params[5].split("=")[1]}
+      data={JSON.parse(decodeURIComponent(query_params[6].split("=")[1]))}
     />
   </React.StrictMode>
 );

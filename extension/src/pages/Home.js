@@ -5,39 +5,41 @@ import Tasks from './Tasks';
 import ListItem from '../components/ListItem';
 import { useEffect, useState } from 'react';
 
-const Home = ({ unread }) => {
-  const [outboxCount, setOutboxCount] = useState(-1);
-  const [billsCount, setBillsCount] = useState(-1);
+const Home = ({ data }) => {
   const [jobsCount, setJobsCount] = useState(-1);
   const [tasksCount, setTasksCount] = useState(-1);
 
-  const getOutboxCounts = () => {
-    instance.get('/dashboards/communications/Messages').then(res => {
-      setOutboxCount(res.ValueWidgets[0].Quantity);
-    });
-  }
-
-  const getBillsCounts = () => {
-    instance.get('/dashboards/transactions/Bills').then(res => {
-      setBillsCount(res.ValueWidgets[0].Quantity);
-    });
-  }
-
   const geJobsCounts = () => {
-    instance.get('/dashboards/activities/Jobs').then(res => {
-      setJobsCount(res.DetailWidgets[0].Values[0].Quantity);
+    instance.get('/session/raw').then(auth => {
+      instance.get('/jobtasks?Timestamp=' + new Date().getTime()).then(res => {
+        let counts = 0;
+        if (auth && res) {
+          const filtered = res.filter(item => item.TenantContactId === auth.MemberId || item.OwnerContactId === auth.MemberId || item.ManagerMemberId === auth.MemberId);
+          if (filtered) {
+            counts = filtered.length;
+          }
+        }
+        setJobsCount(counts);
+      })
     });
   }
 
   const geTasksCounts = () => {
-    instance.get('/dashboards/activities/Tasks').then(res => {
-      setTasksCount(res.DetailWidgets[0].Values[0].Quantity);
+    instance.get('/session/raw').then(auth => {
+      instance.get('/tasks?Timestamp=' + new Date().getTime()).then(res => {
+        let counts = 0;
+        if (auth && res) {
+          const filtered = res.filter(item => item.TenantContactId === auth.MemberId || item.OwnerContactId === auth.MemberId || item.ManagerMemberId === auth.MemberId);
+          if (filtered) {
+            counts = filtered.length;
+          }
+        }
+        setTasksCount(counts);
+      })
     });
   }
 
   useEffect(() => {
-    getOutboxCounts();
-    getBillsCounts();
     geJobsCounts();
     geTasksCounts();
   }, []);
@@ -54,21 +56,21 @@ const Home = ({ unread }) => {
       <ListItem
         linkText={"Inbox"}
         link={Tasks}
-        subText={(unread ? unread * 1 : 0) + " UNREAD"}
+        subText={(data.inbox ? data.inbox * 1 : 0) + " UNREAD"}
         textLink={"https://app.propertyme.com/#/message/inbox"}
         isSelf={'true'}
       />
       <ListItem
         linkText={"Outbox"}
         link={Tasks}
-        subText={`${outboxCount < 0 ? 0 : outboxCount} READY TO SEND`}
+        subText={`${data.outbox ? data.outbox : 0} READY TO SEND`}
         textLink={"https://app.propertyme.com/#/message/list"}
         isSelf={'true'}
       />
       <ListItem
         linkText={"Bills"}
         link={Tasks}
-        subText={`${billsCount < 0 ? 0 : billsCount} Over Due`}
+        subText={`${data.bills ? data.bills : 0} WAITING APPROVAL`}
         textLink={"https://app.propertyme.com/#/bill/list"}
         isSelf={'true'}
       />

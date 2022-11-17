@@ -8,7 +8,7 @@ import "./App.css";
 import Home from "./pages/Home";
 import Tenancies from "./pages/Tenancies";
 
-function App({ parent_url, property_url, unread, showHome, properties, contacts }) {
+function App({ parent_url, property_url, unread, showHome, properties, contacts, data }) {
   if (!parent_url) {
     parent_url = "";
   }
@@ -60,6 +60,7 @@ function App({ parent_url, property_url, unread, showHome, properties, contacts 
           parent_url.indexOf("%2Fproperty%2Flist") < 0) ||
           property_url ||
           parent_url.indexOf("%2Fcontact%2Fedit%2F") > -1 ||
+          parent_url.indexOf("%2Fportal-access%2Ffolio-invites%2F") > -1 ||
           properties) && (
           <Tenancies
             id={query && query.length > 0 ? query[query.length - 1] : ""}
@@ -85,7 +86,8 @@ function App({ parent_url, property_url, unread, showHome, properties, contacts 
         ((parent_url.indexOf("%2Fproperty%2F") === -1 ||
           parent_url.indexOf("%2Fproperty%2Flist") > -1) &&
           parent_url.indexOf('%2Fcontact%2Fedit') < 0 &&
-          !property_url)) && <Home unread={unread} />}
+          parent_url.indexOf('%2Fportal-access%2Ffolio-invites%2F') < 0 &&
+          !property_url)) && <Home unread={unread} data={data} />}
     </Router>
   );
 }
