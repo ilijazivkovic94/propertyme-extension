@@ -34,7 +34,6 @@ const Tenancy = ({ name, subtitle, rent, bond, invoice, link, id }) => {
           display: "flex",
           flexDirection: "row",
           flex: 1,
-          alignItems: "center",
           paddingTop: 10,
           paddingBottom: 10,
         }}
@@ -48,8 +47,6 @@ const Tenancy = ({ name, subtitle, rent, bond, invoice, link, id }) => {
         >
           <Link
             style={{ color: "#88CBB7", fontWeight: "bold" }}
-            component={Rent}
-            props={{ id }}
           >
             Rent
           </Link>
@@ -70,7 +67,6 @@ const Tenancy = ({ name, subtitle, rent, bond, invoice, link, id }) => {
           display: "flex",
           flexDirection: "row",
           flex: 1,
-          alignItems: "center",
           paddingTop: 10,
           paddingBottom: 10,
         }}
@@ -84,8 +80,6 @@ const Tenancy = ({ name, subtitle, rent, bond, invoice, link, id }) => {
         >
           <Link
             style={{ color: "#88CBB7", fontWeight: "bold" }}
-            component={Bond}
-            props={{ id }}
           >
             Bond
           </Link>
@@ -106,7 +100,6 @@ const Tenancy = ({ name, subtitle, rent, bond, invoice, link, id }) => {
           display: "flex",
           flexDirection: "row",
           flex: 1,
-          alignItems: "center",
           paddingTop: 10,
           paddingBottom: 10,
         }}
@@ -120,8 +113,6 @@ const Tenancy = ({ name, subtitle, rent, bond, invoice, link, id }) => {
         >
           <Link
             style={{ color: "#88CBB7", fontWeight: "bold" }}
-            component={Invoice}
-            props={{ id }}
           >
             Invoice
           </Link>

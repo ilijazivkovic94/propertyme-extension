@@ -31,23 +31,37 @@ async function getMessagesCount() {
     outbox: 0,
     bills: 0,
   };
-
-  const inbox_result = await fetch('https://app.propertyme.com/api/comms/threads/unread?format=json', {
+  const user_result = await fetch('https://app.propertyme.com/api/sec/user/profile?format=json', {
     method: 'GET',
   }).then(res => res.json());
-  result.inbox = inbox_result?.Unread || 0;
 
-  const outbox_result = await fetch('https://app.propertyme.com/api/comms/messages/summary?format=json', {
+  const inbox_result = await fetch('https://app.propertyme.com/api/comms/inboxitems?sEcho=1&iColumns=7&sColumns=%2C%2C%2C%2C%2C%2C&iDisplayStart=0&iDisplayLength=50&mDataProp_0=Id&sSearch_0=&bRegex_0=false&bSearchable_0=true&bSortable_0=false&mDataProp_1=Status&sSearch_1=&bRegex_1=false&bSearchable_1=true&bSortable_1=true&mDataProp_2=LastMessageFrom&sSearch_2=&bRegex_2=false&bSearchable_2=true&bSortable_2=true&mDataProp_3=Subject&sSearch_3=&bRegex_3=false&bSearchable_3=true&bSortable_3=false&mDataProp_4=LotReference&sSearch_4=&bRegex_4=false&bSearchable_4=true&bSortable_4=true&mDataProp_5=Manager&sSearch_5=&bRegex_5=false&bSearchable_5=true&bSortable_5=true&mDataProp_6=LastMessageOn&sSearch_6=&bRegex_6=false&bSearchable_6=true&bSortable_6=true&sSearch=&bRegex=false&iSortCol_0=6&sSortDir_0=desc&iSortingCols=1&format=json', {
     method: 'GET',
   }).then(res => res.json());
-  result.outbox = outbox_result?.Emails || 0;
+  const inbox_filtered = inbox_result?.aaData?.filter(item => item.MemberId === user_result.MemberId);
+  result.inbox = inbox_filtered ? inbox_filtered.length : 0;
 
-  const bills_result = await fetch('https://app.propertyme.com/api/financial/bills/count-drafts?format=json', {
+  const outbox_result = await fetch('https://app.propertyme.com/api/comms/messages/list/Outbox/email?sEcho=1&iColumns=5&sColumns=%2C%2C%2C%2C&iDisplayStart=0&iDisplayLength=50&mDataProp_0=Id&sSearch_0=&bRegex_0=false&bSearchable_0=true&bSortable_0=false&mDataProp_1=RecipientName&sSearch_1=&bRegex_1=false&bSearchable_1=true&bSortable_1=true&mDataProp_2=Subject&sSearch_2=&bRegex_2=false&bSearchable_2=true&bSortable_2=false&mDataProp_3=MemberName&sSearch_3=&bRegex_3=false&bSearchable_3=true&bSortable_3=true&mDataProp_4=CreatedOn&sSearch_4=&bRegex_4=false&bSearchable_4=true&bSortable_4=true&sSearch=&bRegex=false&iSortCol_0=4&sSortDir_0=desc&iSortingCols=1&format=json', {
     method: 'GET',
   }).then(res => res.json());
-  result.bills = bills_result || 0;
+  const filtered = outbox_result?.aaData?.filter(item => item.MemberId === user_result.MemberId);
+  result.outbox = filtered ? filtered.length : 0;
+
+  const bills_result = await fetch('https://app.propertyme.com/api/financial/bills/status/draft?sEcho=1&iColumns=12&sColumns=%2C%2C%2C%2C%2C%2C%2C%2C%2C%2C%2C&iDisplayStart=0&iDisplayLength=50&mDataProp_0=Id&sSearch_0=&bRegex_0=false&bSearchable_0=true&bSortable_0=false&mDataProp_1=Number&sSearch_1=&bRegex_1=false&bSearchable_1=true&bSortable_1=true&mDataProp_2=SupplierContactReference&sSearch_2=&bRegex_2=false&bSearchable_2=true&bSortable_2=true&mDataProp_3=LotReference&sSearch_3=&bRegex_3=false&bSearchable_3=true&bSortable_3=true&mDataProp_4=Reference&sSearch_4=&bRegex_4=false&bSearchable_4=true&bSortable_4=true&mDataProp_5=Manager&sSearch_5=&bRegex_5=false&bSearchable_5=true&bSortable_5=true&mDataProp_6=Priority&sSearch_6=&bRegex_6=false&bSearchable_6=true&bSortable_6=true&mDataProp_7=DueDate&sSearch_7=&bRegex_7=false&bSearchable_7=true&bSortable_7=true&mDataProp_8=Detail&sSearch_8=&bRegex_8=false&bSearchable_8=true&bSortable_8=true&mDataProp_9=Document&sSearch_9=&bRegex_9=false&bSearchable_9=true&bSortable_9=false&mDataProp_10=IsTaxed&sSearch_10=&bRegex_10=false&bSearchable_10=true&bSortable_10=true&mDataProp_11=Amount&sSearch_11=&bRegex_11=false&bSearchable_11=true&bSortable_11=true&sSearch=&bRegex=false&iSortCol_0=1&sSortDir_0=asc&iSortingCols=1&format=json', {
+    method: 'GET',
+  }).then(res => res.json());
+  const bills_filtered = bills_result?.aaData?.filter(item => item.Manager === user_result.DisplayName);
+  result.bills = bills_filtered ? bills_filtered.length : 0;
+
   console.log(encodeURIComponent(JSON.stringify(result)));
   return encodeURIComponent(JSON.stringify(result));
+}
+
+async function getInvoicesCount() {
+  const invoice_result = await fetch('https://app.propertyme.com/api/financial/invoices?status=pending&ToFolioId=aeb404fa-464a-ff3e-b770-06927a2dad34&sEcho=1&iColumns=9&sColumns=%2C%2C%2C%2C%2C%2C%2C%2C&iDisplayStart=0&iDisplayLength=50&mDataProp_0=Number&sSearch_0=&bRegex_0=false&bSearchable_0=true&bSortable_0=true&mDataProp_1=DueDate&sSearch_1=&bRegex_1=false&bSearchable_1=true&bSortable_1=true&mDataProp_2=Id&sSearch_2=&bRegex_2=false&bSearchable_2=true&bSortable_2=false&mDataProp_3=ChartAccount&sSearch_3=&bRegex_3=false&bSearchable_3=true&bSortable_3=true&mDataProp_4=Description&sSearch_4=&bRegex_4=false&bSearchable_4=true&bSortable_4=true&mDataProp_5=DocumentStorageId&sSearch_5=&bRegex_5=false&bSearchable_5=true&bSortable_5=true&mDataProp_6=IsTaxed&sSearch_6=&bRegex_6=false&bSearchable_6=true&bSortable_6=true&mDataProp_7=Amount&sSearch_7=&bRegex_7=false&bSearchable_7=true&bSortable_7=true&mDataProp_8=PaidAmount&sSearch_8=&bRegex_8=false&bSearchable_8=true&bSortable_8=true&sSearch=&bRegex=false&iSortCol_0=1&sSortDir_0=asc&iSortingCols=1&format=json', {
+    method: 'GET',
+  }).then(res => res.json());
+  console.log(invoice_result);
 }
 
 async function insertButton() {
@@ -55,6 +69,7 @@ async function insertButton() {
   const url = encodeURIComponent(window.location.href);
 
   let count_result = await getMessagesCount();
+  getInvoicesCount();
   
   let propertyLink = '';
   let properties = '';
@@ -115,10 +130,31 @@ async function insertButton() {
   // Listen to message from child window
   eventer(
     messageEvent,
-    function (e) {
+    async function (e) {
       console.log("parent received message!:  ", e.data);
       if (e.data.type === 'open') {
         window.open(e.data.link, '_blank');
+      }
+      if (e.data.type === 'invoice') {
+        const detail = e.data.detail;
+        let invoice_result = [];
+        if (window.location.href.indexOf('/folio/tenant/') > -1) {
+          invoice_result = await fetch('https://app.propertyme.com/api/financial/invoices?status=pending&ToFolioId=' + detail.Tenancy.FolioId + '&sEcho=1&iColumns=9&sColumns=%2C%2C%2C%2C%2C%2C%2C%2C&iDisplayStart=0&iDisplayLength=50&mDataProp_0=Number&sSearch_0=&bRegex_0=false&bSearchable_0=true&bSortable_0=true&mDataProp_1=DueDate&sSearch_1=&bRegex_1=false&bSearchable_1=true&bSortable_1=true&mDataProp_2=Id&sSearch_2=&bRegex_2=false&bSearchable_2=true&bSortable_2=false&mDataProp_3=ChartAccount&sSearch_3=&bRegex_3=false&bSearchable_3=true&bSortable_3=true&mDataProp_4=Description&sSearch_4=&bRegex_4=false&bSearchable_4=true&bSortable_4=true&mDataProp_5=DocumentStorageId&sSearch_5=&bRegex_5=false&bSearchable_5=true&bSortable_5=true&mDataProp_6=IsTaxed&sSearch_6=&bRegex_6=false&bSearchable_6=true&bSortable_6=true&mDataProp_7=Amount&sSearch_7=&bRegex_7=false&bSearchable_7=true&bSortable_7=true&mDataProp_8=PaidAmount&sSearch_8=&bRegex_8=false&bSearchable_8=true&bSortable_8=true&sSearch=&bRegex=false&iSortCol_0=1&sSortDir_0=asc&iSortingCols=1&format=json', {
+            method: 'GET',
+          }).then(res => res.json());
+          invoice_result = invoice_result ? invoice_result.aaData : [];
+        } else {
+          invoice_result = await fetch('https://app.propertyme.com/api/financial/invoices?status=pending&FromFolioId=' + detail.Ownership.FolioId + '&sEcho=1&iColumns=9&sColumns=%2C%2C%2C%2C%2C%2C%2C%2C&iDisplayStart=0&iDisplayLength=50&mDataProp_0=Number&sSearch_0=&bRegex_0=false&bSearchable_0=true&bSortable_0=true&mDataProp_1=DueDate&sSearch_1=&bRegex_1=false&bSearchable_1=true&bSortable_1=true&mDataProp_2=Id&sSearch_2=&bRegex_2=false&bSearchable_2=true&bSortable_2=false&mDataProp_3=ChartAccount&sSearch_3=&bRegex_3=false&bSearchable_3=true&bSortable_3=true&mDataProp_4=Description&sSearch_4=&bRegex_4=false&bSearchable_4=true&bSortable_4=true&mDataProp_5=DocumentStorageId&sSearch_5=&bRegex_5=false&bSearchable_5=true&bSortable_5=true&mDataProp_6=IsTaxed&sSearch_6=&bRegex_6=false&bSearchable_6=true&bSortable_6=true&mDataProp_7=Amount&sSearch_7=&bRegex_7=false&bSearchable_7=true&bSortable_7=true&mDataProp_8=PaidAmount&sSearch_8=&bRegex_8=false&bSearchable_8=true&bSortable_8=true&sSearch=&bRegex=false&iSortCol_0=1&sSortDir_0=asc&iSortingCols=1&format=json', {
+            method: 'GET',
+          }).then(res => res.json());
+          invoice_result = invoice_result ? invoice_result.aaData : [];
+        }
+        const child_window = document.querySelector('#property_me_extension_content_iframe').contentWindow;
+        child_window.postMessage({
+          type: 'invoice_result',
+          data: invoice_result,
+          id: detail.Id,
+        }, "*")
       }
     },
     false

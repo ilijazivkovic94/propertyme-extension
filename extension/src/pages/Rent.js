@@ -28,7 +28,7 @@ const Rent = ({ id }) => {
       {detailInfo && detailInfo.Tenancy && detailInfo.Tenancy.RentArrears && (
         <ListItem
           linkText={"Rent"}
-          subText={`$${detailInfo?.Tenancy?.RentArrears} IN ARREARS - ${detailInfo?.Tenancy?.RentArrearsByPeriod} DAYS`}
+          subText={`$${detailInfo?.Tenancy?.RentArrears} IN ARREARS - ${detailInfo?.Tenancy?.ArrearsDays} DAYS`}
           textLink={"https://app.propertyme.com/#/property/card/" + id}
         />
       )}
