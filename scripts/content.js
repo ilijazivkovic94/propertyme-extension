@@ -17,7 +17,9 @@ chrome.runtime.onMessage.addListener((request) => {
 
 if (window.location.href.indexOf('app.propertyme.com') > -1 && document.readyState !== 'loading') {
   setTimeout(() => {
-    insertButton();
+    if (document.querySelector('.img-circle.avatar-non-retina')) {
+      insertButton();
+    }
   }, 5000);
 }
 
@@ -85,7 +87,11 @@ async function insertButton() {
     });
   }
   if (window.location.href.indexOf('/property/tenant/edit/') > -1) {
-    const linkAry = window.location.href.split('?')[0].split('/property/tenant/edit/');
+    const linkAry = window.location.href.split('lotId=');
+    properties += linkAry[linkAry.length - 1] + '::';
+  }
+  if (window.location.href.indexOf('/portal-access/folio-invites/') > -1) {
+    const linkAry = window.location.href.split('lotId=');
     properties += linkAry[linkAry.length - 1] + '::';
   }
   if (window.location.href.indexOf('/contact/edit/') > -1) {
@@ -248,7 +254,11 @@ async function insertButton() {
         });
       }
       if (window.location.href.indexOf('/property/tenant/edit/') > -1) {
-        const linkAry = window.location.href.split('?')[0].split('/property/tenant/edit/');
+        const linkAry = window.location.href.split('lotId=');
+        properties += linkAry[linkAry.length - 1] + '::';
+      }
+      if (window.location.href.indexOf('/portal-access/folio-invites/') > -1) {
+        const linkAry = window.location.href.split('lotId=');
         properties += linkAry[linkAry.length - 1] + '::';
       }
       if (window.location.href.indexOf('/contact/edit/') > -1) {

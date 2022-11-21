@@ -5,7 +5,7 @@ import moment from "moment";
 
 let allTenancies = [];
 
-const Tenancies = ({ id, properties, contacts }) => {
+const Tenancies = ({ id, properties, contacts, tenant_id }) => {
   const [isLoading, setLoading] = useState(false);
   const [tenancyList, setTenancyList] = useState([]);
 
@@ -15,11 +15,15 @@ const Tenancies = ({ id, properties, contacts }) => {
       instance
         .get("/lots?Timestamp=" + new Date().getTime())
         .then(async (res) => {
+          console.log(id, tenant_id);
           let result = [];
           if (id) {
             result = res.filter((r) => r.Id === id);
           } else {
             result = res;
+          }
+          if (!id && tenant_id) {
+            result = res.filter((r) => r.Id === tenant_id);
           }
           if (properties && properties.length > 0) {
             result = res.filter((r) => properties.includes(r.Id));
@@ -103,7 +107,7 @@ const Tenancies = ({ id, properties, contacts }) => {
               ? "PAID UP TO DATE"
               : "IN ARREARS - $" + item.Tenancy?.BondArrears + " OWING"
           }
-          invoice={item.invoices ? (
+          invoice={item.invoices && item.invoices.length > 0 ? (
             <div>
               {item.invoices.map(inv => (inv.DueDate >= moment().format('YYYY-MM-DD') ? 
                 <p style={{ marginTop: 0, marginBottom: 0 }}>
