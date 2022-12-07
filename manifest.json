@@ -17,7 +17,8 @@
         "extension/public/fonts/*.*",
         "extension/build/*.*",
         "static/js/*.*",
-        "static/css/*.*"
+        "static/css/*.*",
+        "extension/public/show_directory.html"
       ],
       "matches": ["<all_urls>"],
       "extension_ids": []

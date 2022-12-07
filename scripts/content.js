@@ -106,7 +106,9 @@ async function insertButton() {
   const page_url = chrome.runtime.getURL(
     "/extension/build/index.html?url=" + url + "&propertyURL=" + encodeURIComponent(propertyLink) + '&unread=' + (badge ? badge.innerText : 0) + '&showHome' + showHome + '&properties=' + properties + '&contacts=' + contacts + '&data=' + count_result
   );
+  const directory_url = chrome.runtime.getURL("/extension/build/show_directory.html");
   const logo = chrome.runtime.getURL("/extension/public/images/logo.png");
+  const close = chrome.runtime.getURL("/extension/public/images/close.svg");
 
   const mask = document.createElement("div");
   mask.setAttribute("id", "property_me_externsion_container");
@@ -125,6 +127,20 @@ async function insertButton() {
     `;
 
   mask.innerHTML = modal.outerHTML;
+  
+  let drive_modal = document.createElement("div");
+  drive_modal.setAttribute("id", "property_me_externsion_drive_modal");
+  drive_modal.setAttribute("draggable", "true");
+  drive_modal.innerHTML = `
+    <div id="property_me_extension_modal_dialog">
+      <div id="property_me_extension_modal_close_btn">
+        <img src="${close}"  />
+      </div>
+      <iframe id="property_me_extension_modal_iframe" />
+    </div>
+  `;
+  
+  mask.innerHTML += drive_modal.outerHTML;
   document.body.appendChild(mask);
 
   var eventMethod = window.addEventListener
@@ -161,6 +177,10 @@ async function insertButton() {
           data: invoice_result,
           id: detail.Id,
         }, "*")
+      }
+      if (e.data.type === 'modal') {
+        document.querySelector('#property_me_externsion_drive_modal #property_me_extension_modal_iframe').src = directory_url + '?timestamp=' + new Date().getTime() + '&link=' + encodeURIComponent(e.data.link);
+        document.querySelector('#property_me_externsion_drive_modal').style.display = 'block';
       }
     },
     false
@@ -300,4 +320,11 @@ async function insertButton() {
   .addEventListener('drop', function(e) {
     console.log(e);
    });
+
+  document
+    .querySelector('#property_me_extension_modal_close_btn')
+    .addEventListener('click', function() {
+      document.querySelector('#property_me_externsion_drive_modal #property_me_extension_modal_iframe').src = '';
+      document.querySelector('#property_me_externsion_drive_modal').style.display = 'none';
+    })
 }
