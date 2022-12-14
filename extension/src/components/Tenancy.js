@@ -180,7 +180,7 @@ const Tenancy = ({ name, subtitle, rent, bond, invoice, link, id }) => {
             }}
             onClick={() => {
               if (airtableInfo && airtableInfo.fields['R: Drive Folder Path']) {
-                window.parent.postMessage({ link: airtableInfo.fields['R: Drive Folder Path'], type: 'modal' }, 'https://app.propertyme.com');
+                window.parent.postMessage({ link: 'localexplorer:' + airtableInfo.fields['R: Drive Folder Path'].replace('file://', ''), type: 'open' }, 'https://app.propertyme.com');
               }
             }}
           >
